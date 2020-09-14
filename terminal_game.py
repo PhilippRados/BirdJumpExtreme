@@ -86,7 +86,7 @@ def play(difficulty, resize_w, resize_h):
 
         #curses.noecho()
         #curses.cbreak()
-        stdscr.timeout(20)
+        stdscr.timeout(10)
         inp = stdscr.getch()
         if inp == curses.KEY_LEFT and current_x > 0:
             current_x -= 1 
