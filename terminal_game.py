@@ -31,8 +31,7 @@ def check_for_resize():
     while too_large:
         stdscr.clear()
         resize_h, resize_w = stdscr.getmaxyx()
-        question = f"The game is best played at a smaller window-size. \
-            Current size: {resize_w}"
+        question = f"The game is best played at a smaller window-size. Current size: {resize_w}"
         stdscr.addstr(resize_h//2,(resize_w//2)-len(question)//2, question) 
         too_large = False if resize_w < min_width else True
         stdscr.refresh() 
@@ -55,11 +54,11 @@ def print_env(env,counter):
 
 
 def move_left(current_x, current_y):
-    stdscr.addstr(current_y,current_x,"#")
+    #stdscr.addstr(current_y,current_x,"#")
     stdscr.addstr(current_y,current_x+1," ") 
 
 def move_right(current_x, current_y):
-    stdscr.addstr(current_y,current_x,"#")
+    #stdscr.addstr(current_y,current_x,"#")
     stdscr.addstr(current_y,current_x-1," ") 
 
 def press_exit():
@@ -78,22 +77,28 @@ def play(difficulty, resize_w, resize_h):
         counter += 1
         stdscr.clear()
         #stdscr.refresh()
-        curses.halfdelay(difficulty)
+        #curses.halfdelay(difficulty)
         print_env(env,counter)
         
         #stdscr.refresh()
         stdscr.nodelay(True)
-        stdscr.addstr(current_y,current_x,"#")
+        stdscr.addstr(current_y,current_x,"o/00\o")
 
+        #curses.noecho()
+        #curses.cbreak()
+        stdscr.timeout(20)
         inp = stdscr.getch()
-        if inp  == curses.KEY_LEFT and current_x > 0:
+        if inp == curses.KEY_LEFT and current_x > 0:
             current_x -= 1 
             move_left(current_x, current_y)
         elif inp == curses.KEY_RIGHT and current_x < (resize_w-1): 
             current_x += 1
             move_right(current_x, current_y)
         
-        #curses.halfdelay(2)
+        if current_y+1 == "=":
+            current_y += 4
+        
+
         
 
 def main(stdscr):
