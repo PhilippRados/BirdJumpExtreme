@@ -1,10 +1,10 @@
 import curses
 import random
+import time
 
 # initialize application
 stdscr = curses.initscr()
 
-# tweak terminal settings
 curses.noecho()
 stdscr.keypad(True)
 curses.curs_set(0)
@@ -43,8 +43,8 @@ def print_env(env,counter):
     for y,x in env:
         y += counter
         stdscr.addstr(init_h-1,x,"    ")
-        if y > 1 and y < init_h:
-            stdscr.addstr(y,x,"====")
+        if y > 0 and y < init_h:
+            stdscr.addstr(y,x,"=====")
             stdscr.addstr(y-1,x,"    ")
         else:
             y += counter
@@ -54,11 +54,9 @@ def print_env(env,counter):
 
 
 def move_left(current_x, current_y):
-    #stdscr.addstr(current_y,current_x,"#")
     stdscr.addstr(current_y,current_x+1," ") 
 
 def move_right(current_x, current_y):
-    #stdscr.addstr(current_y,current_x,"#")
     stdscr.addstr(current_y,current_x-1," ") 
 
 def press_exit():
@@ -68,35 +66,44 @@ def press_exit():
     stdscr.refresh()
 
 
-def play(difficulty, resize_w, resize_h):
+def play(resize_w, resize_h):
     playing = True
     current_x, current_y = 10, resize_h//2
     env = create_env(resize_h, resize_w)
     counter = 0
     while playing:   
-        counter += 1
+        #counter += 1
         stdscr.clear()
-        #stdscr.refresh()
-        #curses.halfdelay(difficulty)
         print_env(env,counter)
         
-        #stdscr.refresh()
-        stdscr.nodelay(True)
-        stdscr.addstr(current_y,current_x,"o/00\o")
+        stdscr.refresh()
+        if current_y < resize_h:
+            stdscr.addstr(current_y,current_x,"o/00\o")
+        else:
+            playing = False
 
-        #curses.noecho()
-        #curses.cbreak()
-        stdscr.timeout(10)
+
+        if stdscr.instr(current_y+1, current_x+2,1) == b"=":
+            current_y -= 8
+            # maybe put a timeout here so that the player goes down slower
+            #counter += 4
+            if stdscr.instr(current_y+1, current_x+2,1) == b"=":
+                counter += 2            
+        else:
+            current_y += 1
+
+        stdscr.timeout(100)
         inp = stdscr.getch()
         if inp == curses.KEY_LEFT and current_x > 0:
-            current_x -= 1 
+            current_x -= 4 
             move_left(current_x, current_y)
-        elif inp == curses.KEY_RIGHT and current_x < (resize_w-1): 
-            current_x += 1
+        elif inp == curses.KEY_RIGHT and current_x < (resize_w-6): 
+            current_x += 4
             move_right(current_x, current_y)
-        
-        if current_y+1 == "=":
-            current_y += 4
+
+    stdscr.clear()
+    stdscr.addstr(resize_h//2,resize_w//2 - 5, "Game over")
+    stdscr.refresh()
         
 
         
@@ -128,7 +135,7 @@ def main(stdscr):
         #PLAY Button
         elif key == 10 and current_row == 0:
             stdscr.clear()
-            play(3, resize_w, resize_h)
+            play(resize_w, resize_h)
             break
         
         elif key == 10 and current_row == 1:
