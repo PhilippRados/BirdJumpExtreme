@@ -41,7 +41,7 @@ def create_env(h,w):
     number_of_platforms = (h // 1)-5
     platform_pos = [(0,0),(h-1, random.randint(1,w-5))]
     for _ in range(number_of_platforms):
-        platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-5)))
+        platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-6)))
     del platform_pos[0]
     return platform_pos
 
@@ -60,7 +60,7 @@ def print_env(env,counter):
             y += counter
             y_sorted_by_height = sorted(loop_env, key=lambda tup: tup[0])
             env.remove(y_sorted_by_height[-1])
-            env.append(((3-counter) + number_of_exceeded_platforms, random.randint(1,init_w-5)))
+            env.append(((3-counter) + number_of_exceeded_platforms, random.randint(1,init_w-6)))
         else:
            y += 1
 
@@ -105,12 +105,13 @@ def play(resize_w, resize_h):
             #when new platform is higher
             if plateau_height[1] < plateau_height[0]:
                 diff = plateau_height[0] - plateau_height[1]
-                for i in range(8):
+                for _ in range(8):
                     time.sleep(0.01)
                     stdscr.clear()
-                    if i <= diff:
-                        counter += 1
-                    current_y -= 1
+                    #if i <= diff:
+                    #    counter += 1
+                    #current_y -= 1
+                    counter += 1
                     if current_y < resize_h and current_y > 0:
                         stdscr.addstr(current_y,current_x,"o/00\o")
                     elif current_y > resize_h:
@@ -124,7 +125,8 @@ def play(resize_w, resize_h):
                     stdscr.clear()
                     print_env(env,counter)
                     time.sleep(0.01)
-                    current_y -= 1
+                    #current_y -= 1
+                    counter += 1
                     if current_y < resize_h and current_y > 0:
                         stdscr.addstr(current_y,current_x,"o/00\o")
                     elif current_y > resize_h:
@@ -132,7 +134,8 @@ def play(resize_w, resize_h):
                     stdscr.refresh()
 
         else:
-            current_y += 1
+            #current_y += 1
+            counter -= 1
         
 
         stdscr.timeout(70)
