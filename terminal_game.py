@@ -13,12 +13,13 @@ curses.curs_set(0)
 init_h,init_w = stdscr.getmaxyx()
 min_width = 90
 menu = ['PLAY', 'Choose Character','Scoreboard', 'Exit']
+characters = ["Uwe","Charsten","Robert","Hans","Peter","Simon","Ursulla","Heike"]
 
 curses.start_color()
 curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_YELLOW)
 
-def print_menu(row):
-    for i,text in enumerate(menu):
+def print_menu(row,inhalt):
+    for i,text in enumerate(inhalt):
         h, w = stdscr.getmaxyx()
         x = w//2 - len(text)//2
         y = (h//2 - 2) + i
@@ -78,7 +79,7 @@ def press_exit():
     stdscr.refresh()
 
 
-def play(resize_w, resize_h):
+def play(resize_w, resize_h, character="o/00\o"):
     playing = True
     current_x, current_y = 10, resize_h//2
     env = create_env(resize_h, resize_w)
@@ -86,7 +87,8 @@ def play(resize_w, resize_h):
     plateau_height = [0,0]
     score = 0
     while playing:   
-        score = counter
+        if counter > score:
+            score = counter
         stdscr.clear()
         print_env(env,counter)
         stdscr.addstr(0,0,f"Score: {score}")
@@ -104,13 +106,9 @@ def play(resize_w, resize_h):
 
             #when new platform is higher
             if plateau_height[1] < plateau_height[0]:
-                diff = plateau_height[0] - plateau_height[1]
                 for _ in range(8):
                     time.sleep(0.01)
                     stdscr.clear()
-                    #if i <= diff:
-                    #    counter += 1
-                    #current_y -= 1
                     counter += 1
                     if current_y < resize_h and current_y > 0:
                         stdscr.addstr(current_y,current_x,"o/00\o")
@@ -125,7 +123,6 @@ def play(resize_w, resize_h):
                     stdscr.clear()
                     print_env(env,counter)
                     time.sleep(0.01)
-                    #current_y -= 1
                     counter += 1
                     if current_y < resize_h and current_y > 0:
                         stdscr.addstr(current_y,current_x,"o/00\o")
@@ -134,10 +131,8 @@ def play(resize_w, resize_h):
                     stdscr.refresh()
 
         else:
-            #current_y += 1
             counter -= 1
         
-
         stdscr.timeout(70)
         inp = stdscr.getch()
         if inp == curses.KEY_LEFT and current_x > 1:
@@ -147,14 +142,35 @@ def play(resize_w, resize_h):
             current_x += 3
             move_right(current_x, current_y)
 
+
     stdscr.clear()
     stdscr.addstr(resize_h//2,resize_w//2 - 10, f"Game over. Your score was {score}")
     stdscr.refresh()
-        
+
+def choose_character():
+    current_idx = 0
+    stdscr.clear()
+    print_menu(current_idx, characters)
+    stdscr.refresh()
+
+    char_key = stdscr.getch()
+    while char_key != 10:
+        if char_key == curses.KEY_UP and current_idx > 0:
+            current_idx -= 1
+            print_menu(current_idx, characters)
+        elif char_key == curses.KEY_DOWN and current_idx< 3:
+            current_idx += 1
+            print_menu(current_idx, characters)
+
+    character_chosen = characters[current_idx]
+    return character_chosen
+
+
 
 def main(stdscr):
     current_row = 0
     game = True
+    character = "o/00\o"
 
     while game:
         check_for_resize()
@@ -162,32 +178,31 @@ def main(stdscr):
         stdscr.refresh()
         resize_h, resize_w = stdscr.getmaxyx()
 
-        print_menu(current_row) 
+        print_menu(current_row, menu) 
         key = stdscr.getch()
         if key == curses.KEY_UP and current_row > 0:
             current_row -= 1
-            print_menu(current_row)
+            print_menu(current_row, menu)
         elif key == curses.KEY_DOWN and current_row < 3:
             current_row += 1
-            print_menu(current_row)
+            print_menu(current_row, menu)
     
         #EXIT Button
         if key == 10 and current_row == 3:
             press_exit()
             game = False
         
+        #character choice
         if key == 10 and current_row == 1:
-            stdscr.clear()
-            stdscr.addstr(30,20,"Choose your character")
-            stdscr.refresh()
-            game = False
+            character = choose_character()
 
         #PLAY Button
         elif key == 10 and current_row == 0:
             stdscr.clear()
-            play(resize_w, resize_h)
+            play(resize_w, resize_h, character)
             break
-        
+
+        #Scoreboard Button
         elif key == 10 and current_row == 2:
             stdscr.clear()
             question = "Work in progress..."
