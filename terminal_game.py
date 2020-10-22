@@ -34,20 +34,19 @@ def print_character_menu(row):
     for i,text in enumerate(characters):
         h, w = stdscr.getmaxyx()
         character_height = 8
-        character_width = 4
         x1 = w//2 - 9
         x2 = w//2 + 1
 
         if i % 2 == 0:
-            y_counter += 1 #only increment if plus 2 else decrement
+            y_counter += 1
             y = (h//6) + (y_counter * character_height)
-            if i == row: # highlighted
+            if i == row:
                print_player_highlighted(y,x1,text)
             else:
                 print_player(y,x1,text) 
         else:
             y = (h//6) + (y_counter * character_height)
-            if i == row: # highlighted
+            if i == row:
                print_player_highlighted(y,x2,text)
             else:
                 print_player(y,x2,text)  
@@ -64,9 +63,9 @@ def check_for_resize():
 
 def create_env(h,w):
     number_of_platforms = (h // 1)-5
-    platform_pos = [(0,0),(h-1, random.randint(1,w-5))]
+    platform_pos = [(0,0),(h-1, random.randint(1,w-8))]
     for _ in range(number_of_platforms):
-        platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-6)))
+        platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-8)))
     del platform_pos[0]
     return platform_pos
 
@@ -76,16 +75,16 @@ def print_env(env,counter):
     number_of_exceeded_platforms = 0
     for y,x in loop_env:
         y += counter
-        stdscr.addstr(init_h-1,x,"    ")
+        stdscr.addstr(init_h-1,x,"       ")
         if y > 0 and y < init_h:
-            stdscr.addstr(y,x,"=====")
-            stdscr.addstr(y-1,x,"     ")
+            stdscr.addstr(y,x,"=======")
+            stdscr.addstr(y-1,x,"       ")
         elif y > init_h:
             number_of_exceeded_platforms += 1
             y += counter
             y_sorted_by_height = sorted(loop_env, key=lambda tup: tup[0])
             env.remove(y_sorted_by_height[-1])
-            env.append(((3-counter) + number_of_exceeded_platforms, random.randint(1,init_w-6)))
+            env.append(((3-counter) + number_of_exceeded_platforms, random.randint(1,init_w-8)))
         else:
            y += 1
 
@@ -150,11 +149,16 @@ def play(resize_w, resize_h, character=">o)\n(_>"):
         
         #when platform hit
         if stdscr.instr(current_y+1, current_x,1) == b"=": #maybe use inwstr
-            for _ in range(8):
+            for i in range(10):
                 time.sleep(0.01)
                 stdscr.clear()
                 counter += 1
                 print_player(current_y, current_x, "_._O-")
+                if i < 7:
+                    stdscr.addstr(current_y + 1,current_x, "^  ^· ")
+                    stdscr.addstr(current_y + 2,current_x, " ^^.. ")
+                    stdscr.addstr(current_y + 3,current_x, " .^^ ")
+                    stdscr.addstr(current_y + 4,current_x, "^ ^.^")
                 print_env(env,counter)
                 stdscr.refresh()
             start_time = time.time()
@@ -165,17 +169,16 @@ def play(resize_w, resize_h, character=">o)\n(_>"):
         stdscr.timeout(70)
         inp = stdscr.getch()
         if inp == curses.KEY_LEFT and current_x > 1:
-            current_x -= 3 
+            current_x -= 4 
             move(current_x, current_y,False)
         elif inp == curses.KEY_RIGHT and current_x < (resize_w-6): 
-            current_x += 3
+            current_x += 4
             move(current_x, current_y,True)
         
         timer_since_platform_hit = time.time() - start_time
         
     stdscr.clear()
     stdscr.addstr(resize_h//2,resize_w//2 - 10, f"Game over. Your score was {score}")
-    time.sleep(1)
     stdscr.refresh()
 
 def choose_character():
