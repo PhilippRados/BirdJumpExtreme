@@ -4,7 +4,7 @@ import time
 from tabulate import tabulate
 import pickle
 from curses.textpad import Textbox, rectangle
-from asciimatics.renderers import FigletText
+from art import *
 
 # initialize application
 stdscr = curses.initscr()
@@ -16,7 +16,7 @@ curses.curs_set(0)
 init_h,init_w = stdscr.getmaxyx()
 menu = ['PLAY', 'Choose Character','Scoreboard', 'Exit']
 characters = [">o)\n(_>",' (@>\n{||\n ""'," ,_\n>' )\n( ( \ \n ''","  /\n,'`./\n`.,'\ \n  \ ",
-        "  _\n /_|\n('_)<|\n \_|","   __\n _/__)\n(8|)_}}-\n `\__)"]
+        "  _\n /_|\n('_)<|\n \_|","   __\n _/__)\n(8|)_}}\n `\__)"]
 
 curses.start_color()
 curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_YELLOW)
@@ -39,9 +39,11 @@ def print_menu(row):
         else:
             stdscr.addstr(y,x,text)
 
-def print_character_menu(row):
+def print_character_menu(row,score=100):
     stdscr.clear()
-    y_counter = 0        
+    y_counter = 0   
+    #locked_character = {1:0,2:100,3:250,4:500,5:750,6:1000}
+
     for i,text in enumerate(characters):
         h, w = stdscr.getmaxyx()
         character_height = 8
@@ -52,15 +54,15 @@ def print_character_menu(row):
             y_counter += 1
             y = (h//6) + (y_counter * character_height)
             if i == row:
-               print_player_highlighted(y,x1,text)
+                print_multiple_lines_highlighted(y,x1,text)
             else:
-                print_player(y,x1,text) 
+                print_multiple_lines(y,x1,text) 
         else:
             y = (h//6) + (y_counter * character_height)
             if i == row:
-               print_player_highlighted(y,x2,text)
+               print_multiple_lines_highlighted(y,x2,text)
             else:
-                print_player(y,x2,text)  
+                print_multiple_lines(y,x2,text)  
 
 def check_for_resize(w,h,max_width=90,min_height=36):
     wrong_size = True if w > max_width or h < min_height else False
@@ -124,12 +126,12 @@ def slice_character_string(character):
     return sliced_list
 
 
-def print_player(current_y, current_x,character):
+def print_multiple_lines(current_y, current_x,character):
     sliced_character = slice_character_string(character)
     for i in range(len(sliced_character)):
         stdscr.addstr(current_y - i,current_x - 1,sliced_character[-(i+1)])
 
-def print_player_highlighted(current_y,current_x, character,width=8,height=4):
+def print_multiple_lines_highlighted(current_y,current_x, character,width=8,height=4):
     sliced_character = slice_character_string(character)
     for i in range(height):
         if i >= len(sliced_character):
@@ -138,7 +140,20 @@ def print_player_highlighted(current_y,current_x, character,width=8,height=4):
             text = sliced_character[-(i+1)] + " " * (width - len(sliced_character[-(i+1)]))
             stdscr.addstr(current_y - i,current_x - 1,text,curses.color_pair(1))
 
+def pause_screen(w,h):
+    stdscr.clear()
+    text = text2art("Pause","small")
+    print_multiple_lines((h//2)-3,w//2-12,text)
 
+    print_centered(w,h,"press 'm' to resume")
+    print_centered(w,h + 2,"press 'q' to go back to the menu")
+    stdscr.refresh()
+    return navigation_key_press()
+
+def print_top_bar(resize_w, score):
+    text = "'p' for pause"
+    stdscr.addstr(0,resize_w - (len(text)+2),text)
+    stdscr.addstr(0,0,f"Score: {score}")
 
 def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
     playing = True  
@@ -156,8 +171,8 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
 
         stdscr.clear()
         print_env(resize_w,resize_h,env,counter)
-        print_player(current_y, current_x,character)
-        stdscr.addstr(0,0,f"Score: {score}")
+        print_multiple_lines(current_y, current_x,character)
+        print_top_bar(resize_w, score)
         stdscr.refresh()
         
         #when platform hit
@@ -166,12 +181,12 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
                 time.sleep(0.01)
                 stdscr.clear()
                 counter += 1
-                print_player(current_y, current_x, "_._O-")
+                print_multiple_lines(current_y, current_x, "_._O-")
                 if i < 7:
                     stdscr.addstr(current_y + 1,current_x, "^  ^· ")
                     stdscr.addstr(current_y + 2,current_x, " ^^.. ")
                 print_env(resize_w,resize_h,env,counter)
-                stdscr.addstr(0,0,f"Score: {score}")
+                print_top_bar(resize_w, score)
                 stdscr.refresh()
             start_time = time.time()
 
@@ -180,12 +195,15 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
         
         stdscr.timeout(100)
         inp = stdscr.getch()
-        if inp == curses.KEY_LEFT and current_x > 1:
+        if inp == curses.KEY_LEFT and current_x > 3:
             current_x -= 4 
             move(current_x, current_y,False)
         elif inp == curses.KEY_RIGHT and current_x < (resize_w-6): 
             current_x += 4
             move(current_x, current_y,True)
+        if inp == ord("p"):
+            playing = pause_screen(resize_w, resize_h)
+            start_time = time.time()
         
         timer_since_platform_hit = time.time() - start_time
     save_score(name,score)
@@ -208,7 +226,7 @@ def choose_character(w,h):
     stdscr.clear()
     print_character_menu(current_idx)
     stdscr.refresh()
-
+    
     while True:
         print_centered(w,h,"Press 'm' to jump back to menu","bottom")
         print_centered(w,h,"To choose character press ENTER","top")
@@ -251,14 +269,18 @@ def scoreboard_screen(score_list,w,h):
         stdscr.addstr(y,x2,str(score))
         
         stdscr.addstr(y+1,x1,"-" * 20)
-    print_centered(w,h,"TOP 10","top")
+    
+    text = text2art("Top 10","small")
+    print_multiple_lines(7,(w//2)-12,text)
     print_centered(w,h,"Press 'm' to jump back to menu","bottom")
     stdscr.refresh()
     return navigation_key_press()
 
 def endscreen(score,w,h):
     stdscr.clear()
-    print_centered(w,h,f"Game over. Your score was {score}","mid")
+    text = text2art("Game Over","small")
+    print_multiple_lines((h//2)-3,(w//2)-20,text)
+    print_centered(w,h,f"Your score was {score}","mid")
     print_centered(w,h,"Press 'm' to jump back to menu","bottom")
     return navigation_key_press()
 
@@ -303,6 +325,12 @@ def main(stdscr):
         resize_h, resize_w = stdscr.getmaxyx()
         check_for_resize(resize_w,resize_h)
         stdscr.clear()
+
+        top = text2art("Bird jump","small")
+        bottom = text2art("extreme","small")
+
+        print_multiple_lines(10,(resize_w//2)-20,top) 
+        print_multiple_lines(15,(resize_w//2)-15,bottom) 
         stdscr.refresh()
 
         print_menu(current_row) 
