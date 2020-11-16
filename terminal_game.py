@@ -79,37 +79,44 @@ def check_for_resize(w,h,max_width=90,min_height=36):
 
 def create_env(h,w):
     number_of_platforms = (h // 1)-6
-    platform_pos = [(0,0),(h-1, random.randint(1,w-8))]
+    platform_pos = [(0,0),(h-1, random.randint(1,w-8),False)]
     for _ in range(number_of_platforms):
-        platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-8)))
+        platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-8),False))
     del platform_pos[0]
     return platform_pos
 
+def check_threshhold_drop(loop_env,score,threshhold,dropped_platforms):
+    if len(threshhold) > 0 and score > threshhold[0]:
+        for i in range(3):
+            del loop_env[dropped_platforms[i]]
+        del threshhold[0]
+    return threshhold
 
-def print_env(w,h,env,counter,score,threshhold):
+def print_env(w,h,env,counter,score,fake_platform_probs):
     loop_env = env
     number_of_exceeded_platforms = 0
 
-    if len(threshhold) > 0 and score > threshhold[0]:
-        for _ in range(3):
-            del loop_env[random.randint(0,len(loop_env))]
-        del threshhold[0]
-
-    for y,x in loop_env:
+    for y,x,fake in loop_env:
         y += counter
         stdscr.addstr(h-1,x," " * 7)
-        if y > 0 and y < h:
+        if y > 0 and y < h and fake == False:
             stdscr.addstr(y,x,"=" * 7)
             stdscr.addstr(y-1,x," " * 7)
+        elif y > 0 and y < h and fake == True:
+            stdscr.addstr(y,x,"x" * 7,curses.color_pair(1))
+            stdscr.addstr(y-1,x," " * 7)
+
         elif y > h:
             number_of_exceeded_platforms += 1
             y += counter
             y_sorted_by_height = sorted(loop_env, key=lambda tup: tup[0])
             env.remove(y_sorted_by_height[-1])
-            env.append(((3-counter) + number_of_exceeded_platforms, random.randint(1,w-8)))
+            if random.random() > fake_platform_probs:
+                env.append(((3-counter) + number_of_exceeded_platforms, random.randint(1,w-8),False))
+            else:
+                env.append(((3-counter) + number_of_exceeded_platforms, random.randint(1,w-8),True))
         else:
            y += 1
-    return threshhold
 
 def move(current_x, current_y,right):
     if right:
@@ -177,15 +184,26 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
     timer_since_platform_hit = 0
     start_time = time.time()
     score_threshholds = [100,200,300,500,600,750,1000]
+    threshhold_len = len(score_threshholds)
+    dropped_platforms = random.sample(range(0,len(env)),3)
+    fake_platform_probs = 0.05
 
     while playing:
         # if timer_since_platform_hit > 3:
         #     playing = False
+
+        if threshhold_len > len(score_threshholds):
+            dropped_platforms = random.sample(range(0,len(env)),3)
+            threshhold_len = len(score_threshholds)
+            fake_platform_probs += 0.05
+
         if counter > score:
             score = counter
 
         stdscr.clear()
-        score_threshholds = print_env(resize_w,resize_h,env,counter,score,score_threshholds)
+        print_env(resize_w,resize_h,env,counter,score,fake_platform_probs)
+        score_threshholds = check_threshhold_drop(env,score,score_threshholds,dropped_platforms)
+
         print_multiple_lines(current_y, current_x,character)
         print_top_bar(resize_w, score)
         stdscr.refresh()
@@ -200,7 +218,10 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
                 if i < 7:
                     stdscr.addstr(current_y + 1,current_x, "^  ^· ")
                     stdscr.addstr(current_y + 2,current_x, " ^^.. ")
-                score_threshholds = print_env(resize_w,resize_h,env,counter,score,score_threshholds)
+
+                print_env(resize_w,resize_h,env,counter,score,fake_platform_probs)
+                score_threshholds = check_threshhold_drop(env, score,score_threshholds,dropped_platforms)
+
                 print_top_bar(resize_w, score)
                 stdscr.refresh()
             start_time = time.time()

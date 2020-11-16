@@ -1,3 +1,11 @@
 #write integration tests he<re
+import random
 
-print(u"  \U0001F512\n")
+
+probabilty = 0.1
+
+result = random.random()
+
+if result > probabilty:
+    print(result)
+    print("result is higher!")
