@@ -65,32 +65,39 @@ def print_character_menu(row,locked_character,score=1):
             else:
                 print_multiple_lines(y,x2,text)
 
-def check_for_resize(w,h,max_width=90,min_height=36):
-    wrong_size = True if w > max_width or h < min_height else False
+def check_for_resize(max_width=90,min_width=66,min_height=46):
+    h,w = stdscr.getmaxyx()
+    wrong_size = True if w > max_width or h < min_height \
+         or w < min_width else False
     while wrong_size:
         stdscr.clear()
         resize_h, resize_w = stdscr.getmaxyx()
-        text = "The game is best played at a vertical-rectangle shape"
-        text2 = f"Current size(x,y): {resize_w,resize_h}"
+        text = "Resize your window"
+        text2 = "its either too small or too big"
         print_centered(resize_w,resize_h,text)
         print_centered(resize_w,resize_h+2,text2)
-        wrong_size = False if resize_w < max_width and resize_h > min_height else True
+        wrong_size = False if resize_w < max_width and \
+            resize_h > min_height and resize_w > min_width else True
         stdscr.refresh()
 
 def create_env(h,w):
-    number_of_platforms = (h // 1)-6
+    number_of_platforms = h-6
+    fake_platform_idx = random.sample(range(number_of_platforms),2)
     platform_pos = [(0,0),(h-1, random.randint(1,w-8),False)]
-    for _ in range(number_of_platforms):
-        platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-8),False))
+    for i in range(number_of_platforms):
+        if i in fake_platform_idx:
+            platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-8),True))
+        else:
+            platform_pos.append((platform_pos[-1][0]-1, random.randint(1,w-8),False))
     del platform_pos[0]
     return platform_pos
 
 def check_threshhold_drop(loop_env,score,threshhold,dropped_platforms):
-    if len(threshhold) > 0 and score > threshhold[0]:
-        for i in range(3):
-            del loop_env[dropped_platforms[i]]
-        del threshhold[0]
-    return threshhold
+   if len(threshhold) > 0 and score > threshhold[0]:
+       for i in range(2):
+           del loop_env[dropped_platforms[i]]
+       del threshhold[0]
+   return threshhold
 
 def print_env(w,h,env,counter,score,fake_platform_probs):
     loop_env = env
@@ -175,6 +182,15 @@ def print_top_bar(resize_w, score):
     stdscr.addstr(0,0,f"Score: {score}")
     stdscr.addstr(1,0,"-"*resize_w)
 
+
+def idx_fake_platforms(env,number_of_dropped_platforms):
+    result = []
+    neue = [i for i in env if i[2] == True]
+
+    for i in range(number_of_dropped_platforms):
+        result.append(env.index(random.sample(neue,number_of_dropped_platforms)[i]))
+    return result
+
 def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
     playing = True
     current_x, current_y = 10, resize_h//2
@@ -185,15 +201,16 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
     start_time = time.time()
     score_threshholds = [100,200,300,500,600,750,1000]
     threshhold_len = len(score_threshholds)
-    dropped_platforms = random.sample(range(0,len(env)),3)
+    dropped_platforms = idx_fake_platforms(env,2)
     fake_platform_probs = 0.05
 
     while playing:
-        # if timer_since_platform_hit > 3:
-        #     playing = False
+        check_for_resize()
+    #    if timer_since_platform_hit > 3:
+    #        playing = False
 
         if threshhold_len > len(score_threshholds):
-            dropped_platforms = random.sample(range(0,len(env)),3)
+            dropped_platforms = idx_fake_platforms(env,2)
             threshhold_len = len(score_threshholds)
             fake_platform_probs += 0.05
 
@@ -225,7 +242,6 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
                 print_top_bar(resize_w, score)
                 stdscr.refresh()
             start_time = time.time()
-
         else:
             counter -= 1
 
@@ -263,13 +279,14 @@ def choose_character(w,h):
     scoreboard = pickle.load(open("score_board.pickle","rb"))
     best_score = scoreboard[0][1] if len(scoreboard) > 0 else 1
     locked_character = [0,250,500,750,1000,1500]
-    print_character_menu(current_idx,locked_character,best_score)
-    stdscr.refresh()
 
     while True:
+        check_for_resize()
+        print_character_menu(current_idx,locked_character,best_score)
         print_centered(w,h,"Press 'm' to jump back to menu","bottom")
         print_centered(w,2,"To choose character press ENTER","top")
         print_centered(w,4,"You have to score more points to unlock new characters","top")
+        stdscr.refresh()
 
         char_key = stdscr.getch()
         if char_key == curses.KEY_UP and current_idx > 1:
@@ -369,8 +386,8 @@ def main(stdscr):
     character = ">o)\n(_>"
 
     while game:
-        resize_h, resize_w = stdscr.getmaxyx()
-        check_for_resize(resize_w,resize_h)
+        resize_h,resize_w = stdscr.getmaxyx()
+        check_for_resize()
         stdscr.clear()
 
         top = text2art("Bird jump","small")
@@ -381,7 +398,6 @@ def main(stdscr):
         stdscr.refresh()
 
         print_menu(current_row)
-        stdscr.timeout(70)
         key = stdscr.getch()
         if key == curses.KEY_UP and current_row > 0:
             current_row -= 1
