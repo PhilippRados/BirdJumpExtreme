@@ -206,8 +206,8 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
 
     while playing:
         check_for_resize()
-    #    if timer_since_platform_hit > 3:
-    #        playing = False
+        if timer_since_platform_hit > 3:
+            playing = False
 
         if threshhold_len > len(score_threshholds):
             dropped_platforms = idx_fake_platforms(env,2)
