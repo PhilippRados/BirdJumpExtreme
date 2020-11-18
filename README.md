@@ -41,9 +41,9 @@ Main menu             |  Character screen             | Scoreboard screen
 * You jump from platform to platform trying to go as high as you can
 * But watchout there are fake-platforms (marked yellow) which you can't jump on
   * Fake-platforms also get deleted randomly
-* The higher your the harder it gets
+* The higher your score the harder it gets
 * When you have scored enough points you can unlock new characters
-
+* Checkout the Scoreboard to see your best games
 ---
 ### 4. Have fun!
 insert gif
