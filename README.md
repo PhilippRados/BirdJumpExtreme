@@ -38,7 +38,7 @@ Main menu                  | Scoreboard screen          | Character screen
 ---
 ### 2.Installation
 ```bash
-  pip install BirdJumpExtreme==0.0.1
+  pip install BirdJumpExtreme
 ```
 
 ```bash
