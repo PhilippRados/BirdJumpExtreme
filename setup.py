@@ -1,7 +1,7 @@
 import setuptools
 
-with open("README.md","r") as f:
-    long_description = f.read()
+#with open("README.md","r") as f:
+#    long_description = f.read()
 
 setuptools.setup(
     name="BirdJumpExtreme",
@@ -9,8 +9,8 @@ setuptools.setup(
     author="Philipp Rados",
     author_email="phil.rados@gmail.com",
     description="A fun platform-jumping game for your terminal",
-    long_description=long_description,
-    long_description_content="text/markdown",
+    #long_description=long_description,
+    #long_description_content="text/markdown",
     url="https://github.com/PhilippRados/BirdJumpExtreme",
     packages=setuptools.find_packages(),
     classifiers=[
