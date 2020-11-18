@@ -210,8 +210,8 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
 
     while playing:
         check_for_resize()
-        #if timer_since_platform_hit > 3:
-        #    playing = False
+        if timer_since_platform_hit > 3:
+            playing = False
 
         if threshhold_len > len(score_threshholds):
             threshhold_len = len(score_threshholds)
@@ -374,6 +374,8 @@ def navigation_key_press(endscreen=False):
 
 def name_screen(w,h):
     print_centered(w,2,"Enter NAME: (hit ENTER to send)","top")
+    print_centered(w,h,"To play the game use your arrow keys:","mid")
+    print_centered(w,h+2,"<- left | right ->","mid")
 
     editwin = curses.newwin(1,12, 5,(w//2)-6)
     rectangle(stdscr, 4,w//2-8,6,w//2+8)
