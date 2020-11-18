@@ -92,12 +92,15 @@ def create_env(h,w):
     del platform_pos[0]
     return platform_pos
 
-def check_threshhold_drop(loop_env,score,threshhold,dropped_platforms):
-   if len(threshhold) > 0 and score > threshhold[0]:
-       for i in range(2):
-           del loop_env[dropped_platforms[i]]
-       del threshhold[0]
-   return threshhold
+def check_threshhold_drop(loop_env,score,threshhold):
+    dropped_platforms = idx_fake_platforms(loop_env,2)
+
+    if len(threshhold) > 0 and score > threshhold[0] and len(dropped_platforms) > 1:
+        for i in range(2):
+            if len(loop_env) > dropped_platforms[i]: 
+                del loop_env[dropped_platforms[i]]
+        del threshhold[0]
+    return threshhold
 
 def print_env(w,h,env,counter,score,fake_platform_probs):
     loop_env = env
@@ -186,9 +189,11 @@ def print_top_bar(resize_w, score):
 def idx_fake_platforms(env,number_of_dropped_platforms):
     result = []
     neue = [i for i in env if i[2] == True]
-
-    for i in range(number_of_dropped_platforms):
-        result.append(env.index(random.sample(neue,number_of_dropped_platforms)[i]))
+    if len(neue) > 1:
+        for i in range(number_of_dropped_platforms):
+            random_drop = random.choice(neue)
+            result.append(env.index(random_drop))
+            neue.remove(random_drop)
     return result
 
 def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
@@ -201,16 +206,14 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
     start_time = time.time()
     score_threshholds = [100,200,300,500,600,750,1000]
     threshhold_len = len(score_threshholds)
-    dropped_platforms = idx_fake_platforms(env,2)
     fake_platform_probs = 0.05
 
     while playing:
         check_for_resize()
-        if timer_since_platform_hit > 3:
-            playing = False
+        #if timer_since_platform_hit > 3:
+        #    playing = False
 
         if threshhold_len > len(score_threshholds):
-            dropped_platforms = idx_fake_platforms(env,2)
             threshhold_len = len(score_threshholds)
             fake_platform_probs += 0.05
 
@@ -219,7 +222,7 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
 
         stdscr.clear()
         print_env(resize_w,resize_h,env,counter,score,fake_platform_probs)
-        score_threshholds = check_threshhold_drop(env,score,score_threshholds,dropped_platforms)
+        score_threshholds = check_threshhold_drop(env,score,score_threshholds)
 
         print_multiple_lines(current_y, current_x,character)
         print_top_bar(resize_w, score)
@@ -237,7 +240,7 @@ def play(resize_w, resize_h, character=">o)\n(_>",name="Player1"):
                     stdscr.addstr(current_y + 2,current_x, " ^^.. ")
 
                 print_env(resize_w,resize_h,env,counter,score,fake_platform_probs)
-                score_threshholds = check_threshhold_drop(env, score,score_threshholds,dropped_platforms)
+                score_threshholds = check_threshhold_drop(env, score,score_threshholds)
 
                 print_top_bar(resize_w, score)
                 stdscr.refresh()
