@@ -24,9 +24,14 @@
 ### 1. Introduction
 BirdJump is inspired by Doodle Jump. It's a lightweight & minimalistic mini-game for your terminal. You can choose between different characters which you unlock by having higher and higher scores. You can keep track of your scores in the Scoreboard-screen where the Top-10 best on your local device are saved:
 
-Main menu             |  Character screen             | Scoreboard screen
+Main menu                 | Character screen             | Scoreboard screen
 :-------------------------:|:-------------------------:|:-------------------------:
-![](./images/Main_menu.png)  |  ![](./images/Character_menu.png)| ![](./images/Scoreboard.png)
+![](./images/Main_menu.png)|![](./images/Character_menu.png)|![](./images/Scoreboard.png)
+
+#### Gameplay:
+<p align="center">
+  <img src="https://media.giphy.com/media/B4clywyscqmyL6PMQp/giphy.gif" />
+</p>
 
 ---
 ### 2.Installation
@@ -36,6 +41,7 @@ Main menu             |  Character screen             | Scoreboard screen
 
 ---
 ### 3. How to play
+* Make sure your terminal-window has the right size (it should be like a vertical rectangle)
 * To navigate the game you have to use your keyboard
 * You can move left and right when your playing using your arrow keys
 * You jump from platform to platform trying to go as high as you can
@@ -46,5 +52,3 @@ Main menu             |  Character screen             | Scoreboard screen
 * Checkout the Scoreboard to see your best games
 ---
 ### 4. Have fun!
-
-![Gameplay](https://media.giphy.com/media/B4clywyscqmyL6PMQp/giphy.gif)
