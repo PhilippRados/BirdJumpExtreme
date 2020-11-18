@@ -46,4 +46,5 @@ Main menu             |  Character screen             | Scoreboard screen
 * Checkout the Scoreboard to see your best games
 ---
 ### 4. Have fun!
-insert gif
+
+![Gameplay](https://media.giphy.com/media/B4clywyscqmyL6PMQp/giphy.gif)
