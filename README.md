@@ -37,9 +37,14 @@ Main menu                  | Scoreboard screen          | Character screen
 
 ---
 ### 2.Installation
+```bash
+  pip install BirdJumpExtreme==0.0.1
 ```
-  git clone blabla
+
+```bash
+  python3 terminal_game.py
 ```
+You can also visit https://pypi.org/project/BirdJumpExtreme/0.0.1/
 
 ---
 ### 3. How to play
