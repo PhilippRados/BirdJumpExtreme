@@ -36,7 +36,8 @@ Main menu             |  Character screen             | Scoreboard screen
 
 ---
 ### 3. How to play
-
+* To navigate the game you have to use your keyboard
+* You can move left and right when your playing using your arrow keys
 * You jump from platform to platform trying to go as high as you can
 * But watchout there are fake-platforms (marked yellow) which you can't jump on
   * Fake-platforms also get deleted randomly
