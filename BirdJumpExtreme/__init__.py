@@ -1,0 +1,1 @@
+from BirdJumpExtreme.terminal_game import *

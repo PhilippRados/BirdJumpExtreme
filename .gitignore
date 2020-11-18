@@ -4,3 +4,4 @@ __pycache__
 .terminal_game.py.swp
 .terminal_game.py.swo
 .vimspector.json
+test.py
