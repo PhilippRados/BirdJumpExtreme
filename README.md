@@ -59,8 +59,8 @@ You can also visit https://pypi.org/project/BirdJumpExtreme/0.0.1/
 * Checkout the Scoreboard to see your best games
 ---
 ### 4. Have fun!
-
-##### 5. ToDo, if I ever want to revisit this project
- [] write tests to refactor the code
- [] split the code up in multiple files
- [] clean up the code in general
+---
+#### 5. ToDo (if I ever want to revisit this project)
+- [ ] write tests to refactor the code
+- [ ] split the code up in multiple files
+- [ ] clean up the code in general
